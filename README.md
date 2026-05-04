@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧠 GameDocs AI
 
-## Getting Started
+> Ask your game's brain, not Google.
 
-First, run the development server:
+GameDocs AI is a **RAG (Retrieval-Augmented Generation)** system built for game developers. Upload your GDD, changelogs, and design notes — then ask questions and get answers grounded in your actual documents, with source citations.
+
+**Live Demo:** https://gamedocs-ai.vercel.app
+
+---
+
+## Why This Exists
+
+Sending your entire GDD to an LLM every time you have a question is slow, expensive, and breaks above a certain document size. GameDocs AI solves this with a proper RAG pipeline:
+
+- **Unlimited document size** — only relevant chunks are sent to the LLM, not the whole doc
+- **Persistent knowledge base** — index once, query forever
+- **Source citations** — every answer tells you exactly which document and section it came from
+- **Multi-document support** — query across your entire design library simultaneously
+- **Grounded answers** — the model won't speculate beyond what your documents say
+
+---
+
+## Tech Stack
+
+| Layer | Tool |
+|---|---|
+| Framework | Next.js 14 (App Router, TypeScript) |
+| LLM | Anthropic Claude (claude-sonnet-4-6) |
+| Embeddings | Google Gemini (gemini-embedding-001, 3072 dims) |
+| Vector DB | Pinecone (cosine similarity) |
+| File Parsing | unpdf, mammoth (PDF, DOCX, MD, TXT) |
+| Deployment | Vercel |
+
+---
+
+## Architecture
+User uploads document (PDF / DOCX / MD / TXT)
+↓
+Text extracted → chunked (500 tokens, 50 overlap)
+↓
+Gemini embeddings → 3072-dimensional vectors
+↓
+Vectors upserted to Pinecone index
+↓
+User asks a question
+↓
+Question embedded → similarity search → top 5 chunks retrieved
+↓
+Claude receives: [system prompt + retrieved chunks + question]
+↓
+Answer returned with source citations + similarity scores
+
+---
+
+## How RAG Differs From a Direct LLM Call
+
+| | Direct LLM Call | GameDocs AI (RAG) |
+|---|---|---|
+| Document size limit | ~200k tokens max | Unlimited |
+| Cost per query | Re-sends entire doc | Sends only 5 relevant chunks |
+| Persistence | Re-upload every session | Index once, query forever |
+| Source tracking | None | Cites exact doc + score |
+| Multi-doc support | Manual, messy | Automatic |
+
+---
+
+## Running Locally
+
+```bash
+git clone https://github.com/YOUR_USERNAME/gamedocs-ai.git
+cd gamedocs-ai
+npm install
+```
+
+Create `.env.local`:
+
+```env
+PINECONE_API_KEY=your_key
+PINECONE_INDEX=gamedocs
+GEMINI_API_KEY=your_key
+ANTHROPIC_API_KEY=your_key
+DEMO_PASSWORD=your_password
+NEXT_PUBLIC_DEMO_PASSWORD=your_password
+```
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Usage
 
-## Learn More
+1. Enter the demo password
+2. Click **+ UPLOAD DOC** — supports PDF, DOCX, MD, TXT
+3. Wait for indexing confirmation (shows chunk count)
+4. Ask any question about your uploaded documents
+5. Answers include source citations and similarity scores
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
+app/
+api/
+ingest/route.ts   ← upload + embed + store in Pinecone
+query/route.ts    ← RAG query + Claude answer
+page.tsx            ← UI
+lib/
+pinecone.ts         ← Pinecone client
+embeddings.ts       ← Gemini embedding calls
+extract.ts          ← PDF/DOCX/MD/TXT text extraction
+chunker.ts          ← text chunking logic
+middleware.ts         ← demo password protection
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Built By
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Raheeb Ahmad** — Unity Engineer & AI/ML enthusiast
+- [LinkedIn](https://linkedin.com/in/raheeb-ahmad-48205a21a)
+- [GitHub](https://github.com/raheeb-ahmad)
