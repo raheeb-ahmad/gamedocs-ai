@@ -8,6 +8,8 @@ GameDocs AI is a **RAG (Retrieval-Augmented Generation)** system built for game 
 
 ---
 
+![GameDocs AI Demo](./assets/demo.gif)
+
 ## Why This Exists
 
 Sending your entire GDD to an LLM every time you have a question is slow, expensive, and breaks above a certain document size. GameDocs AI solves this with a proper RAG pipeline:
