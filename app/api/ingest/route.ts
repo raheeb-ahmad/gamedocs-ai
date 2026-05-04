@@ -11,11 +11,22 @@ export async function POST(req: NextRequest) {
 
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
 
+    console.log('File received:', file.name, 'size:', file.size)
+
     const buffer = Buffer.from(await file.arrayBuffer())
     const text = await extractText(buffer, file.name)
+
+    console.log('Extracted text length:', text.length)
+    console.log('Text preview:', text.slice(0, 200))
+
     const chunks = chunkText(text, file.name)
 
-    // Embed in batches of 50
+    console.log('Total chunks:', chunks.length)
+
+    if (chunks.length === 0) {
+      return NextResponse.json({ error: 'No text could be extracted from this file' }, { status: 400 })
+    }
+
     const batchSize = 50
     const vectors = []
 
@@ -36,11 +47,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Upsert to Pinecone in batches of 100
-    for (let i = 0; i < vectors.length; i += 100) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await index.upsert(vectors.slice(i, i + 100) as any)
-    }
+    console.log('Total vectors:', vectors.length)
+
+    // Replace with this:
+    await index.upsert({
+      records: vectors.map(v => ({
+        id: v.id,
+        values: v.values,
+        metadata: v.metadata,
+      }))
+    } as any)
 
     return NextResponse.json({
       success: true,
