@@ -4,10 +4,10 @@ export async function extractText(buffer: Buffer, filename: string): Promise<str
   const ext = filename.split('.').pop()?.toLowerCase()
 
   if (ext === 'pdf') {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse')
-    const data = await pdfParse(buffer)
-    return data.text
+    const { extractText: extractPdfText } = await import('unpdf')
+    const uint8Array = new Uint8Array(buffer)
+    const { text } = await extractPdfText(uint8Array, { mergePages: true })
+    return text
   }
 
   if (ext === 'docx') {
