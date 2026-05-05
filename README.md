@@ -4,8 +4,6 @@
 
 GameDocs AI is a **RAG (Retrieval-Augmented Generation)** system built for game developers. Upload your GDD, changelogs, and design notes — then ask questions and get answers grounded in your actual documents, with source citations.
 
-**Live Demo:** https://gamedocs-ai.vercel.app
-
 ---
 
 ![GameDocs AI Demo](./assets/demo.gif)
