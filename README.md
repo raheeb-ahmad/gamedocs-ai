@@ -29,7 +29,6 @@ Sending your entire GDD to an LLM every time you have a question is slow, expens
 | Embeddings | Google Gemini (gemini-embedding-001, 3072 dims) |
 | Vector DB | Pinecone (cosine similarity) |
 | File Parsing | unpdf, mammoth (PDF, DOCX, MD, TXT) |
-| Deployment | Vercel |
 
 ---
 
