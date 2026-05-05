@@ -45,8 +45,13 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [querying])
 
-  function handleAuth() {
-    if (password === process.env.NEXT_PUBLIC_DEMO_PASSWORD) {
+  async function handleAuth() {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    })
+    if (res.ok) {
       setAuthed(true)
       setAuthError(false)
     } else {
@@ -64,7 +69,7 @@ export default function Home() {
     try {
       const res = await fetch('/api/ingest', {
         method: 'POST',
-        headers: { 'x-demo-password': password },
+        credentials: 'include',
         body: formData,
       })
       const data = await res.json()
@@ -91,7 +96,8 @@ export default function Home() {
     try {
       const res = await fetch('/api/query', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-demo-password': password },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ question }),
       })
       const data = await res.json()
@@ -218,7 +224,6 @@ export default function Home() {
         backgroundSize: '40px 40px',
       }} />
 
-      {/* HEADER */}
       <header style={{
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         padding: '16px 24px',
@@ -298,9 +303,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* CHAT AREA */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '32px 24px', maxWidth: '800px', width: '100%', margin: '0 auto' }}>
-
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', paddingTop: '80px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🧠</div>
@@ -361,7 +364,6 @@ export default function Home() {
               <div style={{ fontSize: '10px', letterSpacing: '2px', color: 'rgba(255,255,255,0.3)', marginBottom: '6px' }}>
                 {msg.role === 'user' ? 'YOU' : 'GAMEDOCS'}
               </div>
-
               <div style={{
                 maxWidth: '680px',
                 padding: '16px 20px',
@@ -421,7 +423,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* INPUT */}
       <div style={{
         borderTop: '1px solid rgba(255,255,255,0.06)',
         padding: '16px 24px',

@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api')) {
-    const password = request.headers.get('x-demo-password')
-    const expected = process.env.DEMO_PASSWORD
+    if (request.nextUrl.pathname === '/api/login') {
+      return NextResponse.next()
+    }
 
-    console.log('incoming password:', password)
-    console.log('expected password:', expected)
+    const cookie = request.cookies.get('gamedocs_auth')?.value
 
-    if (!expected || password !== expected) {
+    if (cookie !== process.env.DEMO_PASSWORD) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
+
   return NextResponse.next()
 }
 
